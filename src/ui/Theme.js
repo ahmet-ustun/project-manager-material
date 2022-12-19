@@ -114,5 +114,19 @@ export default createTheme({
         },
       },
     },
+    MuiTableCell: {
+      head: {
+        fontSize: "1rem",
+        fontWeight: 700,
+        color: arcBlue,
+        borderColor: arcBlue,
+        borderWidth: 2,
+      },
+      body: {
+        color: arcGray,
+        borderColor: arcBlue,
+        borderWidth: 2,
+      }
+    },
   },
 });
