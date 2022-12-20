@@ -126,7 +126,12 @@ export default createTheme({
         color: arcGray,
         borderColor: arcBlue,
         borderWidth: 2,
-      }
+      },
+    },
+    MuiSelect: {
+      icon: {
+        fill: arcOrange,
+      },
     },
   },
 });
