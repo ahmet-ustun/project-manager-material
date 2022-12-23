@@ -36,6 +36,8 @@ import DollarIcon from "@material-ui/icons/AttachMoney.js";
 import DateFnsUtils from "@date-io/date-fns";
 import { format } from "date-fns";
 
+import EnhancedTable from "../src/ui/EnhancedTable.js";
+
 const useStyles = makeStyles((theme) => ({
   service: {
     fontWeight: 300,
@@ -51,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function createData(
+  id,
   name,
   date,
   service,
@@ -62,6 +65,7 @@ function createData(
   search
 ) {
   return {
+    id,
     name,
     date,
     service,
@@ -93,6 +97,7 @@ function ProjectManager() {
 
   const [rows, setRows] = useState([
     createData(
+      "111",
       "Ahmet Ustun",
       "07/10/1994",
       "Website",
@@ -104,6 +109,7 @@ function ProjectManager() {
       true
     ),
     createData(
+      "112",
       "Elon Musk",
       "07/10/1994",
       "Website",
@@ -115,6 +121,7 @@ function ProjectManager() {
       true
     ),
     createData(
+      "113",
       "Bill Gates",
       "07/10/1994",
       "Software",
@@ -126,6 +133,55 @@ function ProjectManager() {
       true
     ),
     createData(
+      "114",
+      "Steve Jobs",
+      "07/10/1994",
+      "Software",
+      "GPS, Push Notifications, Users/Authentication, File Transfer",
+      "Medium",
+      "Web Application",
+      "100+",
+      "$15000",
+      true
+    ),
+    createData(
+      "115",
+      "Ahmet Ustun",
+      "07/10/1994",
+      "Website",
+      "E-Commerce",
+      "N/A",
+      "N/A",
+      "N/A",
+      "$1500",
+      true
+    ),
+    createData(
+      "116",
+      "Elon Musk",
+      "07/10/1994",
+      "Website",
+      "E-Commerce",
+      "N/A",
+      "N/A",
+      "N/A",
+      "$3500",
+      true
+    ),
+    createData(
+      "117",
+      "Bill Gates",
+      "07/10/1994",
+      "Software",
+      "GPS, Push Notifications, Users/Authentication, File Transfer",
+      "Medium",
+      "Web Application",
+      "100+",
+      "$15000",
+      true
+    ),
+    createData(
+      "118",
       "Steve Jobs",
       "07/10/1994",
       "Software",
@@ -145,6 +201,7 @@ function ProjectManager() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
 
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
@@ -205,6 +262,7 @@ function ProjectManager() {
     );
 
     setRows(newRows);
+    setPage(0);
   };
 
   return (
@@ -283,81 +341,8 @@ function ProjectManager() {
             />
           </FormGroup>
         </Grid>
-        <Grid
-          item
-          container
-          justifyContent="flex-end"
-          style={{ marginTop: "5em" }}
-        >
-          <Grid item style={{ marginRight: 75 }}>
-            <FilterListIcon color="secondary" style={{ fontSize: 30 }} />
-          </Grid>
-        </Grid>
-        <Grid item style={{ marginBottom: "15em" }}>
-          <TableContainer component={Paper} elevation={0}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Name
-                  </TableCell>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Date
-                  </TableCell>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Service
-                  </TableCell>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Features
-                  </TableCell>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Complexity
-                  </TableCell>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Platforms
-                  </TableCell>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Users
-                  </TableCell>
-                  <TableCell align="center" style={{ maxWidth: "5em" }}>
-                    Total
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows
-                  .filter((row) => row.search)
-                  .map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.name}
-                      </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.date}
-                      </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.service}
-                      </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.features}
-                      </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.complexity}
-                      </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.platforms}
-                      </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.users}
-                      </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
-                        {row.total}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <Grid item style={{ marginTop: "5em", marginBottom: "35em" }}>
+          <EnhancedTable rows={rows} page={page} setPage={setPage} />
         </Grid>
         <Dialog
           open={isDialogOpen}
