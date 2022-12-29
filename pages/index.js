@@ -112,10 +112,10 @@ function ProjectManager() {
       "112",
       "Elon Musk",
       "07/10/1994",
-      "Website",
+      "Mobile App",
       "E-Commerce",
       "N/A",
-      "N/A",
+      "iOS",
       "N/A",
       "$3500",
       true
@@ -127,7 +127,7 @@ function ProjectManager() {
       "Software",
       "GPS, Push Notifications, Users/Authentication, File Transfer",
       "Medium",
-      "Web Application",
+      "Web",
       "100+",
       "$15000",
       true
@@ -139,7 +139,7 @@ function ProjectManager() {
       "Software",
       "GPS, Push Notifications, Users/Authentication, File Transfer",
       "Medium",
-      "Web Application",
+      "Web",
       "100+",
       "$15000",
       true
@@ -148,10 +148,10 @@ function ProjectManager() {
       "115",
       "Ahmet Ustun",
       "07/10/1994",
-      "Website",
+      "Mobile App",
       "E-Commerce",
       "N/A",
-      "N/A",
+      "Android",
       "N/A",
       "$1500",
       true
@@ -175,7 +175,7 @@ function ProjectManager() {
       "Software",
       "GPS, Push Notifications, Users/Authentication, File Transfer",
       "Medium",
-      "Web Application",
+      "Web",
       "100+",
       "$15000",
       true
@@ -184,10 +184,10 @@ function ProjectManager() {
       "118",
       "Steve Jobs",
       "07/10/1994",
-      "Software",
+      "Mobile App",
       "GPS, Push Notifications, Users/Authentication, File Transfer",
       "Medium",
-      "Web Application",
+      "iOS, Android",
       "100+",
       "$15000",
       true
@@ -227,6 +227,7 @@ function ProjectManager() {
     setRows([
       ...rows,
       createData(
+        "newDataRowId",
         name,
         format(date, "MMMM dd, yyyy"),
         service,
@@ -342,7 +343,16 @@ function ProjectManager() {
           </FormGroup>
         </Grid>
         <Grid item style={{ marginTop: "5em", marginBottom: "35em" }}>
-          <EnhancedTable rows={rows} page={page} setPage={setPage} />
+          <EnhancedTable
+            rows={rows}
+            setRows={setRows}
+            page={page}
+            setPage={setPage}
+            isSoftwareChecked={isSoftwareChecked}
+            isIOSChecked={isIOSChecked}
+            isAndroidChecked={isAndroidChecked}
+            isWebsiteChecked={isWebsiteChecked}
+          />
         </Grid>
         <Dialog
           open={isDialogOpen}
