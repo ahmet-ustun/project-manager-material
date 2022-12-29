@@ -18,6 +18,9 @@ import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+import Snackbar from "@material-ui/core/Snackbar";
+import Button from "@material-ui/core/Button";
+
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 
@@ -61,16 +64,15 @@ const headCells = [
   { id: "total", label: "Total" },
 ];
 
-function EnhancedTableHead(props) {
-  const {
-    classes,
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+function EnhancedTableHead({
+  classes,
+  onSelectAllClick,
+  order,
+  orderBy,
+  numSelected,
+  rowCount,
+  onRequestSort,
+}) {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -112,16 +114,6 @@ function EnhancedTableHead(props) {
   );
 }
 
-EnhancedTableHead.propTypes = {
-  classes: PropTypes.object.isRequired,
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(["asc", "desc"]).isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-};
-
 const useToolbarStyles = makeStyles((theme) => ({
   root: {
     paddingLeft: theme.spacing(2),
@@ -142,9 +134,61 @@ const useToolbarStyles = makeStyles((theme) => ({
   },
 }));
 
-const EnhancedTableToolbar = (props) => {
+const EnhancedTableToolbar = ({
+  numSelected,
+  rows,
+  setRows,
+  selected,
+  setSelected,
+}) => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const [undoRows, setUndoRows] = useState([]);
+
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    color: "",
+  });
+
+  const handleDelete = () => {
+    const newRows = [...rows];
+    const selectedRows = newRows.filter((row) => selected.includes(row.id));
+
+    selectedRows.map((row) => (row.search = false));
+
+    setRows(newRows);
+    setUndoRows(selectedRows);
+    setSelected([]);
+
+    setAlert({
+      open: true,
+      message: "Rows have been deleted!",
+      color: "#FF3232",
+    });
+  };
+
+  const handleUndo = () => {
+    setAlert({ open: false, message: "", color: "" });
+
+    const newRows = [...rows];
+    const redoRows = [...undoRows];
+
+    redoRows.map((row) => (row.search = true));
+    Array.prototype.push.apply(newRows, ...redoRows);
+
+    setRows(newRows);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      setAlert({ open: false, message: "", color: "" });
+
+      const newRows = [...rows];
+      const idList = [...undoRows.map((row) => row.id)];
+
+      setRows(newRows.filter((row) => !idList.includes(row.id)));
+    }
+  };
 
   return (
     <Toolbar
@@ -155,7 +199,7 @@ const EnhancedTableToolbar = (props) => {
       {numSelected > 0 ? (
         <Typography
           className={classes.title}
-          color="inherit"
+          color="primary"
           variant="subtitle1"
           component="div"
         >
@@ -164,7 +208,7 @@ const EnhancedTableToolbar = (props) => {
       ) : (
         <Typography
           className={classes.title}
-          color="inherit"
+          color="primary"
           variant="subtitle1"
           component="div"
         >
@@ -174,7 +218,7 @@ const EnhancedTableToolbar = (props) => {
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton aria-label="delete">
+          <IconButton aria-label="delete" onClick={handleDelete}>
             <DeleteIcon style={{ fontSize: 30 }} color="primary" />
           </IconButton>
         </Tooltip>
@@ -185,12 +229,24 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       )}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={alert.open}
+        message={alert.message}
+        ContentProps={{
+          style: {
+            backgroundColor: alert.color,
+          },
+        }}
+        action={
+          <Button style={{ color: "#FFFFFF" }} onClick={handleUndo}>
+            Undo
+          </Button>
+        }
+        onClose={(event, reason) => handleClose(event, reason)}
+      />
     </Toolbar>
   );
-};
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -217,7 +273,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function EnhancedTable({ rows, page, setPage }) {
+function EnhancedTable({
+  rows,
+  setRows,
+  page,
+  setPage,
+  isSoftwareChecked,
+  isIOSChecked,
+  isAndroidChecked,
+  isWebsiteChecked,
+}) {
   const classes = useStyles();
 
   const [order, setOrder] = useState("asc");
@@ -233,19 +298,19 @@ function EnhancedTable({ rows, page, setPage }) {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.name);
-      setSelected(newSelecteds);
+      const newSelected = rows.map((n) => n.id);
+      setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+  const handleClick = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -271,10 +336,57 @@ function EnhancedTable({ rows, page, setPage }) {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
+  const switchFilters = () => {
+    const softwareRows = rows.filter((row) =>
+      isSoftwareChecked ? row.service === "Software" : null
+    );
+
+    const iOSRows = rows.filter((row) =>
+      isIOSChecked ? row.platforms.includes("iOS") : null
+    );
+
+    const androidRows = rows.filter((row) =>
+      isAndroidChecked ? row.platforms.includes("Android") : null
+    );
+
+    const websiteRows = rows.filter((row) =>
+      isWebsiteChecked ? row.service === "Website" : null
+    );
+
+    if (
+      !isSoftwareChecked &&
+      !isIOSChecked &&
+      !isAndroidChecked &&
+      !isWebsiteChecked
+    ) {
+      return rows;
+    } else {
+      const newRows = softwareRows.concat(
+        iOSRows.filter((item) => softwareRows.indexOf(item) < 0)
+      );
+
+      const newRows2 = newRows.concat(
+        androidRows.filter((item) => newRows.indexOf(item) < 0)
+      );
+
+      const newRows3 = newRows2.concat(
+        websiteRows.filter((item) => newRows2.indexOf(item) < 0)
+      );
+
+      return newRows3;
+    }
+  };
+
   return (
     <div className={classes.root}>
       <Paper className={classes.paper} elevation={0}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          rows={rows}
+          setRows={setRows}
+          selected={selected}
+          setSelected={setSelected}
+        />
         <TableContainer>
           <Table
             className={classes.table}
@@ -293,18 +405,18 @@ function EnhancedTable({ rows, page, setPage }) {
             />
             <TableBody>
               {stableSort(
-                rows.filter((row) => row.search),
+                switchFilters().filter((row) => row.search),
                 getComparator(order, orderBy)
               )
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.name)}
+                      onClick={(event) => handleClick(event, row.id)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
