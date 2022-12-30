@@ -20,9 +20,17 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Snackbar from "@material-ui/core/Snackbar";
 import Button from "@material-ui/core/Button";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import TextField from "@material-ui/core/TextField";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
+import GreaterThanIcon from "@material-ui/icons/KeyboardArrowRight.js";
+import LessThanIcon from "@material-ui/icons/KeyboardArrowLeft.js";
+import EqualToIcon from "@material-ui/icons/DragHandle.js";
+import DollarIcon from "@material-ui/icons/AttachMoney.js";
 
 import clsx from "clsx";
 import PropTypes from "prop-types";
@@ -132,6 +140,18 @@ const useToolbarStyles = makeStyles((theme) => ({
   title: {
     flex: "1 1 100%",
   },
+  menu: {
+    "&:hover": {
+      backgroundColor: "#FFFFFF",
+    },
+    "&.Mui-focusVisible": {
+      backgroundColor: "#FFFFFF",
+    },
+  },
+  totalFilter: {
+    fontSize: "2rem",
+    color: theme.palette.common.orange,
+  },
 }));
 
 const EnhancedTableToolbar = ({
@@ -142,7 +162,13 @@ const EnhancedTableToolbar = ({
   setSelected,
 }) => {
   const classes = useToolbarStyles();
+
   const [undoRows, setUndoRows] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openMenu, setOpenMenu] = useState(false);
+
+  const [totalFilter, setTotalFilter] = useState(">");
+  const [filterPrice, setFilterPrice] = useState("");
 
   const [alert, setAlert] = useState({
     open: false,
@@ -190,6 +216,56 @@ const EnhancedTableToolbar = ({
     }
   };
 
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.target);
+    setOpenMenu(true);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setOpenMenu(false);
+  };
+
+  const handleTotalFilter = (event) => {
+    setFilterPrice(event.target.value);
+
+    if (event.target.value) {
+      const newRows = [...rows];
+
+      newRows.map((row) => {
+        const operator = totalFilter === "=" ? "===" : totalFilter;
+
+        eval(`${event.target.value} ${operator} ${row.total.split("$")[1]}`)
+          ? (row.search = true)
+          : (row.search = false);
+      });
+
+      setRows(newRows);
+    } else {
+      const newRows = [...rows];
+
+      newRows.map((row) => (row.search = true));
+
+      setRows(newRows);
+    }
+  };
+
+  const changeFilter = (operator) => {
+    if (filterPrice) {
+      const newRows = [...rows];
+
+      newRows.map((row) => {
+        const actionItem = operator === "=" ? "===" : operator;
+
+        eval(`${filterPrice} ${actionItem} ${row.total.split("$")[1]}`)
+          ? (row.search = true)
+          : (row.search = false);
+      });
+
+      setRows(newRows);
+    }
+  };
+
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -224,7 +300,7 @@ const EnhancedTableToolbar = ({
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
+          <IconButton aria-label="filter list" onClick={handleMenuClick}>
             <FilterListIcon style={{ fontSize: 30 }} color="secondary" />
           </IconButton>
         </Tooltip>
@@ -245,6 +321,61 @@ const EnhancedTableToolbar = ({
         }
         onClose={(event, reason) => handleClose(event, reason)}
       />
+      <Menu
+        id="simple-menu"
+        style={{ zIndex: 1305 }}
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleMenuClose}
+        elevation={0}
+        keepMounted
+      >
+        <MenuItem classes={{ root: classes.menu }}>
+          <TextField
+            placeholder="Enter a price to filter"
+            value={filterPrice}
+            onChange={handleTotalFilter}
+            InputProps={{
+              type: "number",
+              startAdornment: (
+                <InputAdornment position="start">
+                  <DollarIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setTotalFilter(
+                      totalFilter === ">"
+                        ? "<"
+                        : totalFilter === "<"
+                        ? "="
+                        : ">"
+                    );
+                    changeFilter(
+                      totalFilter === ">"
+                        ? "<"
+                        : totalFilter === "<"
+                        ? "="
+                        : ">"
+                    );
+                  }}
+                >
+                  {totalFilter === ">" ? (
+                    <GreaterThanIcon className={classes.totalFilter} />
+                  ) : totalFilter === "<" ? (
+                    <LessThanIcon className={classes.totalFilter} />
+                  ) : (
+                    <EqualToIcon className={classes.totalFilter} />
+                  )}
+                </InputAdornment>
+              ),
+            }}
+          />
+        </MenuItem>
+      </Menu>
     </Toolbar>
   );
 };
