@@ -24,6 +24,8 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Chip from "@material-ui/core/Chip";
+import Grid from "@material-ui/core/Grid";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
@@ -160,15 +162,16 @@ const EnhancedTableToolbar = ({
   setRows,
   selected,
   setSelected,
+  totalFilter,
+  setTotalFilter,
+  filterPrice,
+  setFilterPrice,
 }) => {
   const classes = useToolbarStyles();
 
   const [undoRows, setUndoRows] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openMenu, setOpenMenu] = useState(false);
-
-  const [totalFilter, setTotalFilter] = useState(">");
-  const [filterPrice, setFilterPrice] = useState("");
 
   const [alert, setAlert] = useState({
     open: false,
@@ -402,6 +405,11 @@ const useStyles = makeStyles((theme) => ({
     top: 20,
     width: 1,
   },
+  filterChip: {
+    marginRight: "2em",
+    backgroundColor: theme.palette.common.blue,
+    color: "#FFFFFF",
+  },
 }));
 
 function EnhancedTable({
@@ -419,7 +427,10 @@ function EnhancedTable({
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
   const [selected, setSelected] = useState([]);
+
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [totalFilter, setTotalFilter] = useState(">");
+  const [filterPrice, setFilterPrice] = useState("");
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -508,6 +519,26 @@ function EnhancedTable({
     }
   };
 
+  const checkFilteredPrices = (switchFiltersFn) => {
+    if (filterPrice) {
+      const newRows = [...switchFiltersFn];
+
+      newRows.map((row) => {
+        const actionItem = totalFilter === "=" ? "===" : totalFilter;
+
+        eval(`${filterPrice} ${actionItem} ${row.total.split("$")[1]}`)
+          ? row.search === false
+            ? null
+            : (row.search = true)
+          : (row.search = false);
+      });
+
+      return newRows;
+    } else {
+      return switchFiltersFn;
+    }
+  };
+
   return (
     <div className={classes.root}>
       <Paper className={classes.paper} elevation={0}>
@@ -517,6 +548,10 @@ function EnhancedTable({
           setRows={setRows}
           selected={selected}
           setSelected={setSelected}
+          totalFilter={totalFilter}
+          setTotalFilter={setTotalFilter}
+          filterPrice={filterPrice}
+          setFilterPrice={setFilterPrice}
         />
         <TableContainer>
           <Table
@@ -536,7 +571,9 @@ function EnhancedTable({
             />
             <TableBody>
               {stableSort(
-                switchFilters().filter((row) => row.search),
+                checkFilteredPrices(switchFilters()).filter(
+                  (row) => row.search
+                ),
                 getComparator(order, orderBy)
               )
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -600,12 +637,39 @@ function EnhancedTable({
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.filter((row) => row.search).length}
+          count={
+            checkFilteredPrices(switchFilters()).filter((row) => row.search)
+              .length
+          }
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+        <Grid container justifyContent="flex-end">
+          <Grid item>
+            {filterPrice ? (
+              <Chip
+                className={classes.filterChip}
+                label={
+                  totalFilter === ">"
+                    ? `Less than $${filterPrice}`
+                    : totalFilter === "<"
+                    ? `Greater than $${filterPrice}`
+                    : `Equal to $${filterPrice}`
+                }
+                onDelete={() => {
+                  setFilterPrice("");
+                  const newRows = [...rows];
+
+                  newRows.map((row) => (row.search = true));
+
+                  setRows(newRows);
+                }}
+              />
+            ) : null}
+          </Grid>
+        </Grid>
       </Paper>
     </div>
   );
