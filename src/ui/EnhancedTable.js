@@ -603,29 +603,82 @@ function EnhancedTable({
                         scope="row"
                         padding="none"
                         align="center"
-                        style={{ maxWidth: "5em" }}
+                        style={{
+                          minWidth: "5em",
+                          maxWidth: "5em",
+                          wordBreak: "break-word",
+                        }}
                       >
                         {row.name}
                       </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
+                      <TableCell
+                        align="center"
+                        style={{
+                          minWidth: "5em",
+                          maxWidth: "5em",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {row.date}
                       </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
+                      <TableCell
+                        align="center"
+                        style={{
+                          minWidth: "5em",
+                          maxWidth: "5em",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {row.service}
                       </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
+                      <TableCell
+                        align="center"
+                        style={{
+                          minWidth: "10em",
+                          maxWidth: "10em",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {row.features}
                       </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
+                      <TableCell
+                        align="center"
+                        style={{
+                          minWidth: "5em",
+                          maxWidth: "5em",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {row.complexity}
                       </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
+                      <TableCell
+                        align="center"
+                        style={{
+                          minWidth: "5em",
+                          maxWidth: "5em",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {row.platforms}
                       </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
+                      <TableCell
+                        align="center"
+                        style={{
+                          minWidth: "5em",
+                          maxWidth: "5em",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {row.users}
                       </TableCell>
-                      <TableCell align="center" style={{ maxWidth: "5em" }}>
+                      <TableCell
+                        align="center"
+                        style={{
+                          minWidth: "5em",
+                          maxWidth: "5em",
+                          wordBreak: "break-word",
+                        }}
+                      >
                         {row.total}
                       </TableCell>
                     </TableRow>
