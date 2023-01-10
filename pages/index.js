@@ -220,7 +220,9 @@ function ProjectManager() {
   const serviceQuestion = (
     <React.Fragment>
       <Grid item style={{ marginTop: matchesSM ? "3em" : "5em" }}>
-        <Typography variant="h4">Service</Typography>
+        <Typography variant="h4" style={{ fontSize: matchesSM && "1.7em" }}>
+          Service
+        </Typography>
       </Grid>
       <Grid item>
         <RadioGroup
@@ -261,7 +263,9 @@ function ProjectManager() {
   const complexityQuestion = (
     <React.Fragment>
       <Grid item style={{ marginTop: matchesSM ? "3em" : "5em" }}>
-        <Typography variant="h4">Complexity</Typography>
+        <Typography variant="h4" style={{ fontSize: matchesSM && "1.7em" }}>
+          Complexity
+        </Typography>
       </Grid>
       <Grid item>
         <RadioGroup
@@ -299,7 +303,9 @@ function ProjectManager() {
   const usersQuestion = (
     <React.Fragment>
       <Grid item style={{ marginTop: matchesSM ? "3em" : "5em" }}>
-        <Typography variant="h4">Users</Typography>
+        <Typography variant="h4" style={{ fontSize: matchesSM && "1.7em" }}>
+          Users
+        </Typography>
       </Grid>
       <Grid item>
         <RadioGroup
@@ -527,7 +533,11 @@ function ProjectManager() {
           <DialogContent>
             <Grid container justifyContent="center">
               <Grid item>
-                <Typography variant="h1" gutterBottom>
+                <Typography
+                  variant="h1"
+                  style={{ fontSize: matchesSM && "2.5em" }}
+                  gutterBottom
+                >
                   Add a new project
                 </Typography>
               </Grid>
@@ -614,8 +624,8 @@ function ProjectManager() {
             <Hidden mdUp>
               <Grid container direction="column" alignItems="center">
                 <Grid item>{serviceQuestion}</Grid>
-                <Grid item>{complexityQuestion}</Grid>
                 <Grid item>{usersQuestion}</Grid>
+                <Grid item>{complexityQuestion}</Grid>
               </Grid>
             </Hidden>
             <Grid
